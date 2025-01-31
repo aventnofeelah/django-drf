@@ -2,8 +2,13 @@ from django.shortcuts import render
 from .models import User, Project, Category, Priority, Task
 from .serializers import UserSerializer, ProjectSerializer, CategorySerializer, PrioritySerializer, TaskSerializer
 from rest_framework import permissions, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
+import logging
 
 # Create your views here.
+
+logger = logging.getLogger(__name__)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -29,3 +34,10 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['project', 'priority', 'category']
+    search_fields = ['title', 'description']
+
+    def perform_create(self, serializer):
+        logger.info("Creating a new task")
+        serializer.save()
