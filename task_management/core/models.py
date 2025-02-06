@@ -1,15 +1,19 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser 
 
 # Create your models here.
 
-class User(models.Model):
-    first_name = models.CharField(max_length=30, verbose_name="First name")
-    last_name = models.CharField(max_length=30, verbose_name="Last name")
-    email = models.EmailField(unique=True, verbose_name="Email")
+ROLE_CHOICES = [ 
+        ('admin', 'Admin'), 
+        ('manager', 'Manager'), 
+        ('employee', 'Employee'), 
+] 
+class User(AbstractUser): 
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='employee') 
 
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
-
+    def __str__(self): 
+        return f"{self.username} ({self.role})"
+    
 class Project(models.Model):
     name = models.CharField(max_length=100, verbose_name="Project title")
     description = models.TextField(verbose_name="Description")
@@ -18,6 +22,12 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['name', 'start_date', 'end_date'])
+        ]
+        
     
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name="Category name")
@@ -42,3 +52,8 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['title', 'project', 'due_date'])
+        ]
