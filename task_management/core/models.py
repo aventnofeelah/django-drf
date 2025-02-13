@@ -57,3 +57,8 @@ class Task(models.Model):
         indexes = [
             models.Index(fields=['title', 'project', 'due_date'])
         ]
+
+class Contact(models.Model):
+    name = models.CharField(max_length=100) 
+    email = models.EmailField() 
+    message = models.TextField() 
